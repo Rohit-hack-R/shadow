@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Registration with AR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            width: 300px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        #ar-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #ar-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <form id="login-form">
+                <h2>Login</h2>
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="#" onclick="toggleForms()">Register</a></p>
+            </form>
+
+            <form id="register-form" style="display: none;">
+                <h2>Register</h2>
+                <input type="text" placeholder="Username" required>
+                <input type="email" placeholder="Email" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit">Register</button>
+                <p>Already have an account? <a href="#" onclick="toggleForms()">Login</a></p>
+            </form>
+        </div>
+        <button id="ar-button" onclick="startAR()">Start AR Experience</button>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            if (loginForm.style.display === "none") {
+                loginForm.style.display = "block";
+                registerForm.style.display = "none";
+            } else {
+                loginForm.style.display = "none";
+                registerForm.style.display = "block";
+            }
+        }
+
+        function startAR() {
+            // Initialize WebXR and Three.js for AR experience
+            if (navigator.xr) {
+                navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+                    if (supported) {
+                        navigator.xr.requestSession('immersive-ar').then(onSessionStarted);
+                    } else {
+                        alert('AR not supported on this device.');
+                    }
+                });
+            } else {
+                alert('WebXR not supported on this browser.');
+            }
+        }
+
+        function onSessionStarted(session) {
+            // Set up Three.js scene and start AR session
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            session.addEventListener('end', () => {
+                renderer.dispose();
+                document.body.removeChild(renderer.domElement);
+            });
+
+            // Add AR content here
+
+            function animate() {
+                renderer.render(scene, camera);
+                session.requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
